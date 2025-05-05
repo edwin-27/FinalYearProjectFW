@@ -1,0 +1,79 @@
+﻿@model FinalYearProject.Models.Order
+
+@{
+    ViewBag.Title = "Order Confirmation";
+}
+
+<h2 class="mt-4">Thank you for your purchase!</h2>
+
+<hr />
+<h4>Order Summary</h4>
+<p><strong>Order ID:</strong> @Model.Id</p>
+<p><strong>Order Date:</strong> @Model.OrderDate.ToString("dd MMM yyyy HH:mm")</p>
+
+<hr />
+<h4>Delivery Address</h4>
+@if (Model.DeliveryAddress != null)
+{
+    <p>
+        @Model.DeliveryAddress.firstName @Model.DeliveryAddress.lastName<br />
+        @Model.DeliveryAddress.line1<br />
+        @if (!string.IsNullOrWhiteSpace(Model.DeliveryAddress.line2))
+        {
+            @Model.DeliveryAddress.line2 <br />
+        }
+        @Model.DeliveryAddress.townOrCity<br />
+        @Model.DeliveryAddress.postcode
+    </p>
+}
+
+<h4>Billing Address</h4>
+@if (Model.BillingAddress != null)
+{
+    <p>
+        @Model.BillingAddress.firstName @Model.BillingAddress.lastName<br />
+        @Model.BillingAddress.line1<br />
+        @if (!string.IsNullOrWhiteSpace(Model.BillingAddress.line2))
+        {
+            @Model.BillingAddress.line2 <br />
+        }
+        @Model.BillingAddress.townOrCity<br />
+        @Model.BillingAddress.postcode
+    </p>
+}
+
+<hr />
+<h4>Items Purchased</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Line Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderItems)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@item.Quantity</td>
+                <td>£@item.UnitPrice.ToString("0.00")</td>
+                <td>£@item.LineTotal.ToString("0.00")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+<h4>Delivery</h4>
+<p><strong>Option:</strong> @Model.DeliveryOption</p>
+<p><strong>Cost:</strong> £@Model.DeliveryCost.ToString("0.00")</p>
+
+<hr />
+<h3>Total Paid: £@Model.TotalAmount.ToString("0.00")</h3>
+
+<form method="post" action="@Url.Action("ClearBasketAndReturn", "Checkout")">
+    <button type="submit" class="btn btn-primary mt-4">Back to Home</button>
+</form>

@@ -1,0 +1,130 @@
+﻿@using FinalYearProject.ViewModels;
+@using FinalYearProject.Controllers;
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+    var deliveryId = Context.Session.GetInt32("SelectedDeliveryChoiceId");
+    var deliveryAddressId = Context.Session.GetInt32("DeliveryAddressId");
+    var billingAddressId = Context.Session.GetInt32("BillingAddressId");
+    bool allSelected = deliveryId != null && deliveryAddressId != null && billingAddressId != null;
+}
+
+
+
+
+<h1 class="text-center mb-4">Checkout</h1>
+
+<!-- Basket Summary Section -->
+<div class="bg-light border rounded p-4 mb-5 shadow-sm">
+    <h3 class="text-center mb-4">Basket Summary</h3>
+    <table class="table table-bordered">
+        <thead class="table-secondary">
+            <tr>
+                <th>Item</th>
+                <th>Colour</th>
+                <th>Size</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.basketSummary.items)
+            {
+                <tr>
+                    <td>@item.productName</td>
+                    <td>@item.colour</td>
+                    <td>@item.size</td>
+                    <td>£@item.price</td>
+                    <td>@item.quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p><strong>Subtotal:</strong> £@Model.basketSummary.subTotalofProducts.ToString("0.00")</p>
+
+    @if (!string.IsNullOrEmpty(Model.basketSummary.deliveryLabel))
+    {
+        <table class="table mt-3">
+            <tr>
+                <td><strong>Delivery Method:</strong></td>
+                <td>@Model.basketSummary.deliveryLabel</td>
+            </tr>
+            <tr>
+                <td><strong>Delivery Cost:</strong></td>
+                <td>£@Model.basketSummary.deliveryPrice?.ToString("0.00")</td>
+            </tr>
+            <tr>
+                <td class="text-end fw-bold" colspan="2">
+                    Final Total: £@((Model.basketSummary.subTotalofProducts + (Model.basketSummary.deliveryPrice ?? 0)).ToString("0.00"))
+
+                </td>
+            </tr>
+        </table>
+    }
+</div>
+
+<!-- Delivery & Billing Section -->
+<div class="bg-white border rounded p-4 shadow-sm">
+    <h3 class="text-center mb-4">Delivery & Billing</h3>
+
+    <!-- Delivery Option -->
+    <h5>Select Delivery Option</h5>
+    <form asp-action="saveDeliveryChoice" method="post" class="d-flex mb-3">
+        <select name="id" class="form-select me-2">
+            <option value="">-- Select Delivery Option --</option>
+            @foreach (var option in ViewBag.DeliveryChoice)
+            {
+                <option value="@option.Id" selected="@(option.Id == deliveryId)">
+                    @option.option - £@option.price
+                </option>
+            }
+        </select>
+        <button type="submit" class="btn btn-outline-primary">Save</button>
+    </form>
+
+    <!-- Delivery Address -->
+    <h5>Select Delivery Address</h5>
+    <form asp-action="saveChosenDeliveryAddress" method="post" class="d-flex mb-3">
+        <select name="id" class="form-select me-2">
+            <option value="">-- Select Delivery Address --</option>
+            @foreach (var address in ViewBag.Addresses)
+            {
+                <option value="@address.Id" selected="@(address.Id == deliveryAddressId)">
+                    @address.line1, @address.line2, @address.townOrCity, @address.postcode
+                </option>
+            }
+        </select>
+        <button type="submit" class="btn btn-outline-primary">Save</button>
+    </form>
+    <a asp-controller="Address" asp-action="AddAddress" asp-route-type="delivery" class="btn btn-outline-success btn-sm mb-4">
+        Add New Delivery Address
+    </a>
+
+    <!-- Billing Address -->
+    <h5>Select Billing Address</h5>
+    <form asp-action="saveChosenBillingAddress" method="post" class="d-flex mb-3">
+        <select name="id" class="form-select me-2">
+            <option value="">-- Select Billing Address --</option>
+            @foreach (var address in ViewBag.Addresses)
+            {
+                <option value="@address.Id" selected="@(address.Id == billingAddressId)">
+                    @address.line1, @address.line2, @address.townOrCity, @address.postcode
+                </option>
+            }
+        </select>
+        <button type="submit" class="btn btn-outline-primary">Save</button>
+    </form>
+    <a asp-controller="Address" asp-action="AddAddress" asp-route-type="billing" class="btn btn-outline-success btn-sm mb-4">
+        Add New Billing Address
+    </a>
+
+    <!-- Confirm Button -->
+    <div class="text-center mt-4">
+        <form method="post" asp-action="confirmOrder" asp-controller="Checkout">
+            <button type="submit" class="btn btn-success btn-lg" @(allSelected ? "" : "disabled")>
+                Confirm Purchase
+            </button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,299 @@
+﻿
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Fashion Warehouse</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    @*<link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />*@
+    @*<link rel="stylesheet" href="~/css/vendor.css" asp-append-version="true" />*@
+    @*<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />*@
+
+
+</head>
+<style>
+    /* Show dropdown on hover */
+    .nav-item.dropdown:hover .dropdown-content {
+        display: block !important;
+    }
+
+    /* Optional styling improvements */
+    .dropdown-content a {
+        color: black;
+        text-decoration: none;
+        padding: 10px;
+        display: block;
+    }
+
+        .dropdown-content a:hover {
+            background-color: none;
+            color: goldenrod;
+        }
+
+</style>
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow ">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Fashion Warehouse</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <!-- Admin sees only brand title; no navigation links -->
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+
+                            <li class="nav-item dropdown" style="position: relative;">
+                                <a href="javascript:void(0)" class="nav-link dropdown-toggle" id="clothingDropdown" role="button">
+                                    Clothing
+                                </a>
+                                <div class="dropdown-content" style="display: none; position: absolute; border:1px solid black; background-color: black; width: 600px; left: 0; z-index: 1000;">
+                                    <div class="row" style="display: flex;">
+                                        <div class="column" style="width: 33.33%; padding: 10px; background-color: #ededed;">
+                                            
+                                            <a href="@Url.Action("Index", "Category", new {id = "MEN"})">Mens</a>
+
+                                            
+                                        </div>
+                                        <div class="column" style="width: 33.33%; padding: 10px; background-color: #ededed;">
+
+                                            <a href="@Url.Action("Index", "Category", new {id = "WCLO"})">Womens</a>
+
+
+                                        </div>
+                                        <div class="column" style="width: 33.33%; padding: 10px; background-color: #ededed;">
+
+                                            <a href="@Url.Action("Index", "Category", new {id = "KIDSCLO"})">Kids</a>
+
+
+                                        </div>
+                                    
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="nav-item dropdown" style="position: relative;">
+                                <a href="javascript:void(0)" class="nav-link dropdown-toggle" id="trainerDropdown" role="button">
+                                    Trainers
+                                </a>
+                                <div class="dropdown-content" style="display: none; position: absolute; background-color: #f9f9f9; width: 600px; left: 0; z-index: 1000;">
+                                    <div class="row" style="display: flex;">
+                                        <div class="column" style="width: 33.33%; padding: 10px; background-color: #ededed;">
+                                            <a href="@Url.Action("Index", "Category", new {id = "MTR"})">Mens</a>
+                                        </div>
+                                        <div class="column" style="width: 33.33%; padding: 10px; background-color: #ededed;">
+                                            <a href="@Url.Action("Index", "Category", new {id = "WTR"})">Womens</a>
+                                        </div>
+                                        <div class="column" style="width: 33.33%; padding: 10px; background-color: #ededed;">
+                                            <a href="@Url.Action("Index", "Category", new {id = "KIDSTR"})">Kids</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Basket" asp-action="Index">Your Basket</a>
+                            </li>
+                        }
+                    </ul>
+
+
+                    <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link"> @User.Identity.Name</span>
+                            </li>
+                            <li class="nav-item">
+                                <form method="post" action="~/Identity/Account/Logout" class="form-inline">
+                                    <button type="submit" class="btn btn-link nav-link">Logout</button>
+                                </form>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link " href="~/Identity/Account/ForgotPassword">Reset Password</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="~/Identity/Account/Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="~/Identity/Account/Register">Register</a>
+                            </li>
+                        }
+                    </ul>
+
+
+                </div>
+            </div>
+        </nav>
+    </header>
+    <header style="display: flex; justify-content: center; align-items: center; padding: 16px; background-color:#FDEE89; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 24px;">
+            <form asp-controller="search" asp-action="Index" method="get" style="display: flex; align-items: center;">
+                <input type="text" class="form-control" placeholder="Find your product" id="searchterm" name="searchterm"
+                       value="@ViewBag.SearchKeyword" style="width: 400px; padding: 6px;" />
+                <button type="submit" class="btn btn-dark" style="margin-left: 8px;">Search</button>
+            </form>
+
+            <button onclick="startListening()" class="btn btn-light" style="padding: 6px 12px;">🎤 Speak</button>
+            <p id="transcript" style="display:none;"></p>
+        </div>
+    </header>
+    
+
+
+
+
+
+    <script>
+        const transcriptEl = document.getElementById('transcript');
+
+        function startListening() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-GB';
+            recognition.interimResults = false;
+
+            recognition.onresult = (event) => {
+                console.log(event);
+                const text = event.results[0][0].transcript;
+                console.log(text);
+                transcriptEl.textContent = text;
+                handleVoiceCommand(text); // Send to handler
+            };
+
+            recognition.onerror = (event) => {
+                alert('Error: ' + event.error);
+            };
+
+            recognition.start();
+        }
+
+        function handleVoiceCommand(text) {
+            // Example: "Show me laptops under 1000"
+            window.location = '/search/?' + new URLSearchParams({ searchterm: text })
+        }
+    </script>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-auto">
+        <div class="container">
+            &copy; 2025 - FinalYearProject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/plugins.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/script.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+  
+
+
+    <script>
+        (function () { if (!window.chatbase || window.chatbase("getState") !== "initialized") { window.chatbase = (...arguments) => { if (!window.chatbase.q) { window.chatbase.q = [] } window.chatbase.q.push(arguments) }; window.chatbase = new Proxy(window.chatbase, { get(target, prop) { if (prop === "q") { return target.q } return (...args) => target(prop, ...args) } }) } const onLoad = function () { const script = document.createElement("script"); script.src = "https://www.chatbase.co/embed.min.js"; script.id = "eoOyE_FZsJi9xmpyDJw6F"; script.domain = "www.chatbase.co"; document.body.appendChild(script) }; if (document.readyState === "complete") { onLoad() } else { window.addEventListener("load", onLoad) } })();
+    </script>
+
+    <script>
+        const userMessageHandler = (event) => {
+            console.log("User message received:", event);
+        };
+
+        const toolcallHandler = (event) => {
+            console.log("Tool Call message received:", event);
+        };
+
+        const toolresultHandler = (event) => {
+            console.log("Tool Result message received:", event);
+        };
+
+        const assistantmessageHandler = (event) => {
+            console.log("Assistant message received:", event);
+        };
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+
+        // Attach the event listener
+        // window.chatbase.addEventListener("user-message", userMessageHandler);
+        // window.chatbase.addEventListener("tool-call", toolcallHandler);
+        // window.chatbase.addEventListener("tool-result", toolresultHandler);
+        // window.chatbase.addEventListener("assistant-message", assistantmessageHandler);
+
+        window.chatbase.registerTools({
+            My_order_status: async (args, user) => {
+                // args contains parameters defined in your custom action
+                // user contains authenticated user data if identity verification is set up
+
+                console.log("My_order_status:", args);
+                console.log("My_order_status2:", user);
+
+
+                const deldays = getRandomInt(10);
+                const order_id = args["order-id"];
+
+                // return {
+                //     data: `Your order ${order_id} has been despatched.It will be delivered in ${ deldays } days`,
+                //     status: "success"
+                // };
+
+                var order_status_url = '@Url.Action("GetStatus", "orders", new { })';
+                try {
+
+                    if (order_status_url.indexOf("?") >= 0)
+                        order_status_url = order_status_url + "&email_id=" + args["email-id"];
+                    else
+                        order_status_url = order_status_url + "?email_id=" + args["email-id"];
+
+                    order_status_url = order_status_url + "&order_id=" + args["order-id"];
+
+                    //`https://localhost:7000/orders/GetStatus/?email_id=${args["email-id"]}&order_id=${args["order-id"]}`
+
+
+                    const response = await fetch(
+                        order_status_url
+                    );
+
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch weather data.");
+                    }
+
+                    const data = await response.json();
+
+                    return { data: data.data, status: "success" };
+
+                } catch (error) {
+                    // Return only the error message without any data
+                    return { status: "error", message: error.message };
+                }
+            },
+        });
+
+    </script>
+
+    <!--ChatBase End-->
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

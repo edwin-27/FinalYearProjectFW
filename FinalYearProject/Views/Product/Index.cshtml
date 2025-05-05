@@ -1,0 +1,154 @@
+﻿@model Product
+
+@foreach (var item in ViewBag.PagePath)
+{
+    if (item.Code == "")
+    {
+        <a href="@Url.Action("", "Home")">
+            @item.Name
+        </a>
+        @(" > ")
+    }
+    else if (Model.Code == item.Code)
+    {
+        @item.Name
+    }
+    else
+    {
+        <a href="@Url.Action("Index", "Category", new { id = item.Code })">
+            @item.Name
+        </a>
+        @(" > ")
+    }
+    <span style="padding-right:10px" />
+
+}
+@Model.Name
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="@Model.Image" alt="@Model.Name" class="img-fluid border rounded shadow-sm" />
+
+        </div>
+
+        <div class="col-md-8">
+            <h2>@Model.Name</h2>
+
+
+            @if (Model.ProductVariants != null && Model.ProductVariants.Any())
+            {
+                <h4 class=" text-success mt-3">£@Model.ProductVariants.First()?.Price</h4>
+            }
+            else
+            {
+                <h4 class=" text-danger mt-3">Price not available for this product</h4>
+            }
+            <p class="text-muted">@Html.Raw(Model.Description)</p>
+
+            <h5 class="mt-3"> Other Available colours</h5>
+            @if (Model.ProductVariants != null && Model.ProductVariants.Any())
+            {
+                <div class="mt-2">
+                    <form method="get" asp-action="Index">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <div class="d-flex flex-wrap">
+                            @foreach (var uniqueColour in Model.ProductVariants.Select(pv => pv.Colour).Distinct())
+                            {
+                                <button type="submit" name="colourSelected" value="@uniqueColour"
+                                        style="background-color:@uniqueColour; width: 25px; height: 35px; "
+                                        title="@uniqueColour"
+                                        class="btn border rounded-circle p-2 me-2"></button>
+                            }
+                        </div>
+                    </form>
+                </div>
+
+                <div class="mt-3">
+
+                    @if (!string.IsNullOrEmpty(ViewBag.SelectedColour))
+                    {
+
+                        var selectedC = ViewBag.SelectedColour as string;
+                        var selectedS = ViewBag.SelectedSize as string;
+
+                        <h5 class="fw-bold mt-3">@ViewBag.SelectedColour</h5>
+                        <span class="ms-2">Sizes Available</span>
+
+                        <div class="btn-group" role="group">
+                            @foreach (var pv in Model.ProductVariants.Where(pv => pv.Colour == ViewBag.SelectedColour))
+                            {
+                                <form method="get" asp-action="Index" style="display:inline;">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <input type="hidden" name="colourSelected" value="@selectedC" />
+                                    <input type="hidden" name="sizeSelected" value="@pv.Size" />
+                                    <button class=" btn btn-outline-dark m-3 @(pv.Size == selectedS ? "active" : "")">
+                                        @pv.Size
+                                    </button>
+                                </form>
+
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(ViewBag.SelectedSize))
+                        {
+                            var productVariant = Model.ProductVariants.FirstOrDefault(pv => pv.Colour == selectedC && pv.Size == selectedS);
+
+                            @if (productVariant != null)
+                            {
+                                <form method="post" asp-controller="Basket" asp-action="AddToBasket" class="mt-3">
+                                    <input name="productVariantId" value="@productVariant.Id" type="hidden" />
+                                    <button type="submit" class="btn btn-success">Add to Basket</button>
+                                </form>
+                            }
+
+
+
+                        }
+                        else
+                        {
+                            <div class="mt-3">
+                                <button class="btn btn-secondary" disabled>Pick a size</button>
+                            </div>
+                        }
+                    }
+
+
+
+                </div>
+
+
+            }
+            else
+            {
+                <p class="text-bg-danger"> No other variants available</p>
+            }
+
+            <a href="@(Context.Request.Headers["Referer"].ToString())" class="btn btn-outline-secondary"> Back</a>
+
+        </div>
+        <section class="mt-5">
+            <h4 class="text-primary mb-3">You May Like</h4>
+            <div class="d-flex overflow-auto gap-3 p-2 border rounded bg-light" style="scroll-behavior:smooth;">
+                @foreach (var shirt in ViewBag.RecommendedShirts as List<Product>)
+                {
+                    <div class="card shadow-sm" style="min-width: 180px;">
+                        <img src="@shirt.Image" class="card-img-top img-fluid" alt="@shirt.Name">
+                        <div class="card-body p-2 text-center">
+                            <h6 class="card-title mb-1">@shirt.Name</h6>
+                            @if (shirt.ProductVariants != null && shirt.ProductVariants.Any())
+                            {
+                                <p class="text-danger fw-bold mb-0">£@shirt.ProductVariants.First().Price</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted mb-0">No Price</p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+    </div>
+</div>

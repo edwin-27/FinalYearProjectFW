@@ -1,0 +1,77 @@
+﻿@model List<FinalYearProject.ViewModels.AdminOrderViewModel>
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1 class="mt-4 mb-3 text-center">Admin Dashboard</h1>
+
+<div class="container mb-4">
+    <div class="card p-4 shadow-sm">
+        <h5 class="mb-3">Admin Tools</h5>
+        <div class="btn-group" role="group" aria-label="Admin tools">
+            <a asp-action="Index" asp-controller="Admin" asp-route-id="IndexAWS" class="btn btn-outline-primary">
+                Update OpenSearch
+            </a>
+            <a asp-action="ChatBase" asp-controller="Admin" class="btn btn-outline-secondary">
+                Generate Product Export For Chatbase
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-3">Order History</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Delivery Option</th>
+                            <th>Billing Address ID</th>
+                            <th>Customer ID</th>
+                            <th>Delivery Address ID</th>
+                            <th>Delivery Cost</th>
+                            <th>Order Date</th>
+                            <th>Total Amount</th>
+                            <th>Despatch Date</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Tracking URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td>@order.Id</td>
+                                <td>@order.DeliveryOption</td>
+                                <td>@(order.BillingAddressId?.ToString() ?? "N/A")</td>
+                                <td>@order.CustomerId</td>
+                                <td>@(order.DeliveryAddressId?.ToString() ?? "N/A")</td>
+                                <td>@order.DeliveryCost.ToString("C")</td>
+                                <td>@order.OrderDate.ToString("g")</td>
+                                <td>@order.TotalAmount.ToString("C")</td>
+                                <td>@(order.DespatchDate?.ToString("g") ?? "N/A")</td>
+                                <td>@order.InvEmail</td>
+                                <td>@order.OrderStatus</td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(order.TrackingUrl))
+                                    {
+                                        <a href="@order.TrackingUrl" class="btn btn-sm btn-link" target="_blank">Track</a>
+                                    }
+                                    else
+                                    {
+                                        <span>N/A</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

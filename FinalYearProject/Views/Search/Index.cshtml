@@ -1,0 +1,187 @@
+﻿@model FinalYearProject.ViewModels.CategoryViewModel
+@using FinalYearProject.Libs
+
+<div class="container mt-4">
+
+    <h1>@Model.SearchTerm</h1>
+
+    <!-- Breadcrumb -->
+    <nav class="mb-3">
+        @foreach (var item in Model.PagePath)
+        {
+            if (item.Code == "")
+            {
+                <a href="@Url.Action("", "Home")">@item.Name</a>
+            }
+            else if (Model.Code == item.Code)
+            {
+                @item.Name
+            }
+            else
+            {
+                <a href="@Url.Action("Index", "Category", new { id = item.Code })">@item.Name</a>
+            }
+            if (Model.Code != item.Code)
+            {
+                @(" > ")
+            }
+        }
+    </nav>
+
+    <h1 class="mb-4">@Model.Name</h1>
+
+    <div class="row">
+        <!-- Filter Section -->
+        <div class="col-md-3">
+            @if (Model.ColourFacets != null)
+            {
+                <div class="mb-4">
+                    <h5>Colour</h5>
+                    @foreach (var colour in Model.ColourFacets)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input color-filter" type="checkbox" value="@colour.Code"
+                                   id="color@colour.Code"
+                            @(colour.isAvailable ? "" : "disabled")
+                            @(colour.isSelected ? "checked" : "")
+                                   onclick="applyFilters()" />
+                            <label class="form-check-label" for="color@colour.Code">@colour.Code</label>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (Model.SizeFacets != null)
+            {
+                <div class="mb-4">
+                    <h5>Size</h5>
+                    @foreach (var size in Model.SizeFacets)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input size-filter" type="checkbox" value="@size.Code"
+                                   id="size@size.Code"
+                            @(size.isAvailable ? "" : "disabled")
+                            @(size.isSelected ? "checked" : "")
+                                   onclick="applyFilters()" />
+                            <label class="form-check-label" for="size@size.Code">@size.Code</label>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Main Product Area -->
+        <div class="col-md-9">
+
+            <!-- Subcategories -->
+            @if (Model.subcategories != null)
+            {
+                <div class="row mb-4">
+                    @foreach (var category in Model.subcategories)
+                    {
+                        <div class="col-4 col-sm-3 col-lg-2 text-center mb-3">
+                            <a href="@Url.Action("Index", "Category", new { id = category.Code })">
+                                <img src="@("/images/cat_" + category.Code + ".png")" style="width: 300px;" />
+                                <div class="mt-1">@category.Name</div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Products -->
+            @if (Model.Products != null && Model.Products.Count > 0)
+            {
+                <div class="row">
+                    @foreach (var product in Model.Products)
+                    {
+                        <div class="col-6 col-md-4 col-lg-3 mb-4">
+                            <div class="card h-100 text-center p-2">
+                                <a href="@Url.Action("Index", "Product", new { id = product.Id })">
+                                    <img src="@product.Image"
+                                         style="height: 234px; width: 100%; object-fit: contain;" />
+                                </a>
+                                <div class="card-body p-2">
+                                    <a href="@Url.Action("Index", "Product", new { id = product.Id })" class="d-block mb-1">
+                                        @product.Name
+                                    </a>
+                                    <small class="text-muted">From</small>
+                                    <div>@Util.GetPrice(product.MainVariant.Price)</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>No products available</p>
+            }
+
+            <!-- Pagination -->
+            <div class="mt-3">
+                <strong>Page:</strong>
+                @for (int PageIndex = 0; PageIndex < Model.Page.Maximum; PageIndex++)
+                {
+                    <a href="javascript:navpage(@(PageIndex + 1))" class="mx-1">@(PageIndex + 1)</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getSelectedValues(className) {
+        return Array.from(document.querySelectorAll(`.${className}:checked`))
+            .map(cb => cb.value);
+    }
+
+    function applyFilters() {
+        const selectedColors = getSelectedValues("color-filter");
+        const selectedSizes = getSelectedValues("size-filter");
+
+        //let caturl = "@Url.Action("Index", "Category", new { id = Model.Code })";
+        let caturl = window.location.href;
+        caturl = removeUrlParameter(caturl, "facetcolour");
+        caturl = removeUrlParameter(caturl, "facetsize");
+
+        caturl += (caturl.indexOf("?") >= 0 ? "&" : "?") + "facetcolour=" + selectedColors.join(",");
+        caturl += "&facetsize=" + selectedSizes.join(",");
+
+        window.location = caturl;
+    }
+
+    // const price = $('#pricerange').val();
+    // alert(price)
+
+
+    //   alert(selectedColors);
+    //    alert(selectedSizes);
+
+
+    function navpage(PageIndex) {
+        let caturl = window.location.href;
+        caturl = removeUrlParameter(caturl, "page");
+        caturl += (caturl.indexOf("?") >= 0 ? "&" : "?") + "page=" + PageIndex;
+        window.location = caturl;
+    }
+
+
+    // const filtered = products.filter(p => {
+    //     const categoryMatch = !selectedCategories.length || selectedCategories.includes(p.category);
+    //     const colorMatch = !selectedColors.length || selectedColors.includes(p.color);
+    //     const sizeMatch = !selectedSizes.length || selectedSizes.includes(p.size);
+    //     return categoryMatch && colorMatch && sizeMatch;
+    // });
+
+    // alert(filtered);
+
+
+    function removeUrlParameter(url, param) {
+        const [base, queryString] = url.split("?");
+        if (!queryString) return url;
+        const params = queryString.split("&").filter(p => !p.startsWith(param + "="));
+        return params.length > 0 ? `${base}?${params.join("&")}` : base;
+    }
+</script>

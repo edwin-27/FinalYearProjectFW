@@ -1,0 +1,40 @@
+﻿@using FinalYearProject.ViewModels
+@model AddressViewModel
+
+<h1 class="mb-4 text-center">Add Address</h1>
+
+<form asp-action="AddAddress" method="post">
+    <input type="hidden" asp-for="customerId" value="1" />
+
+    <div class="form-group mb-3">
+        <label asp-for="firstName" class="form-label"></label>
+        <input asp-for="firstName" class="form-control" placeholder="Enter First Name" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="lastName" class="form-label"></label>
+        <input asp-for="lastName" class="form-control" placeholder="Enter Last Name" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="line1" class="form-label"></label>
+        <input asp-for="line1" class="form-control" placeholder="Address Line 1" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="line2" class="form-label"></label>
+        <input asp-for="line2" class="form-control" placeholder="Address Line 2 (Optional)" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="townOrCity" class="form-label"></label>
+        <input asp-for="townOrCity" class="form-control" placeholder="Enter Town or City" />
+    </div>
+
+    <div class="form-group mb-4">
+        <label asp-for="postcode" class="form-label"></label>
+        <input asp-for="postcode" class="form-control" placeholder="Enter Postcode" />
+    </div>
+
+    <button type="submit" class="btn btn-dark">Submit Address</button>
+</form>
